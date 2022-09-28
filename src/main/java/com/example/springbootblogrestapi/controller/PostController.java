@@ -2,6 +2,7 @@ package com.example.springbootblogrestapi.controller;
 
 import com.example.springbootblogrestapi.entity.Post;
 import com.example.springbootblogrestapi.payload.PostDto;
+import com.example.springbootblogrestapi.payload.PostResponse;
 import com.example.springbootblogrestapi.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,11 @@ public class PostController {
 
     //get all posts rest api
     @GetMapping
-    public List<PostDto> getAllPosts(){
-        return postService.getAllPosts();
+    public PostResponse getAllPosts(
+            @RequestParam(value="pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value="pageSize", defaultValue = "10", required = false) int pageSize
+    ){
+        return postService.getAllPosts(pageNo, pageSize);
     }
 
     //get post by id

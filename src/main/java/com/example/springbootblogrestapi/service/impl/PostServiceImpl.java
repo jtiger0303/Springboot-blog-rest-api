@@ -3,8 +3,12 @@ package com.example.springbootblogrestapi.service.impl;
 import com.example.springbootblogrestapi.entity.Post;
 import com.example.springbootblogrestapi.exception.ResourceNotFoundException;
 import com.example.springbootblogrestapi.payload.PostDto;
+import com.example.springbootblogrestapi.payload.PostResponse;
 import com.example.springbootblogrestapi.repository.PostRepository;
 import com.example.springbootblogrestapi.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
@@ -37,9 +41,24 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        List<Post> posts=postRepository.findAll();
-        return posts.stream().map(post -> mapToDTO(post)).collect(Collectors.toList());
+    public PostResponse getAllPosts(int pageNo, int pageSize) {
+
+        //create Pageable Instance
+        Pageable pageable= PageRequest.of(pageNo, pageSize);
+        Page<Post> posts=postRepository.findAll(pageable);
+
+        //get content for page object
+        List<Post> listOfPosts=posts.getContent();
+        List<PostDto> content=listOfPosts.stream().map(post -> mapToDTO(post)).collect(Collectors.toList());
+        PostResponse postResponse=new PostResponse();
+        postResponse.setContent(content);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setLast(posts.isLast());
+
+        return postResponse;
     }
 
     @Override
@@ -72,6 +91,7 @@ public class PostServiceImpl implements PostService{
     //convert Entity into DTO
     private PostDto mapToDTO(Post post){
         PostDto postDto= new PostDto();
+        postDto.setId(post.getId());
         postDto.setTitle(post.getTitle());
         postDto.setDescription(post.getDescription());
         postDto.setContent(post.getContent());
