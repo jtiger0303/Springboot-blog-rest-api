@@ -1,14 +1,14 @@
 package com.example.springbootblogrestapi.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data //Generate getters for all fields=Getter&Setter&RequiredArgsConstructor
+//@Data //Generate getters for all fields=Getter&Setter&RequiredArgsConstructor, doesn't need while loop,
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 
