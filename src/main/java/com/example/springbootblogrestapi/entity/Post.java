@@ -2,7 +2,9 @@ package com.example.springbootblogrestapi.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,4 +35,8 @@ public class Post {
 
     @OneToMany(mappedBy="post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments=new HashSet<>();
+
+    @ManyToOne(fetch =FetchType.LAZY) //whenever we load post JPA entity, then the Category won't load immediately
+    @JoinColumn(name="category_id")
+    private Category category; //many posts can have one category
 }

@@ -2,11 +2,14 @@ package com.example.springbootblogrestapi.security;
 
 import com.example.springbootblogrestapi.exception.BlogAPIException;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 
 @Component
@@ -15,7 +18,7 @@ public class JwtTokenProvider {
     @Value("${app.jwt-secret}")
     private String jwtSecret;
     @Value("${app.jwt-expiration-milliseconds}")
-    private int jwtExpirationInMs;
+    private long jwtExpirationInMs;
 
     // generate token
     public String generateToken(Authentication authentication){
@@ -27,15 +30,21 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(key())
                 .compact();
         return token;
+    }
+
+    private Key key(){
+        return Keys.hmacShaKeyFor(
+                Decoders.BASE64.decode(jwtSecret)
+        );
     }
 
     // get username from the token
     public String getUsernameFromJWT(String token){
         Claims claims=Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(key())
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
@@ -44,7 +53,10 @@ public class JwtTokenProvider {
     // validate JWT token
     public boolean validateToken(String token){
         try{
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(key())
+                    .parseClaimsJws(token)
+                    .getBody();
             return true;
         }catch(SignatureException ex){
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid JWT signature");
@@ -60,5 +72,6 @@ public class JwtTokenProvider {
 
 
     }
+
 
 }
