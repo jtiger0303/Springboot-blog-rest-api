@@ -55,7 +55,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeHttpRequests((authorize)->
                         //authorize.anyRequest().authenticated()
-                        authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                        authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll() //all users can get "/api/**"
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()
                 ).exceptionHandling(
