@@ -5,6 +5,7 @@ import com.example.springbootblogrestapi.payload.PostDto;
 import com.example.springbootblogrestapi.payload.PostResponse;
 import com.example.springbootblogrestapi.service.PostService;
 import com.example.springbootblogrestapi.utils.AppConstants;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,9 @@ public class PostController {
         this.postService = postService;
     }
 
+    @SecurityRequirement(
+          name="Bear Authentication"
+    )
     @PreAuthorize("hasRole('ADMIN')") //only admin user can able to access api
     //Create Blog Post
     @PostMapping
@@ -60,5 +64,13 @@ public class PostController {
     public ResponseEntity<String> deletePost(@PathVariable(name="id") long id){
         postService.deletePostById(id);
         return new ResponseEntity<>("Post entity successfully deleted", HttpStatus.OK);
+    }
+
+    //Build Get Posts by Category REST API
+    // http://localhost:8083/api/posts/category/3
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable(name="id") Long categoryId){
+        List<PostDto> postDtos= postService.getPostsByCategory(categoryId);
+        return ResponseEntity.ok(postDtos);
     }
 }
