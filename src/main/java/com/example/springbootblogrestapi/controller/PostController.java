@@ -5,7 +5,10 @@ import com.example.springbootblogrestapi.payload.PostDto;
 import com.example.springbootblogrestapi.payload.PostResponse;
 import com.example.springbootblogrestapi.service.PostService;
 import com.example.springbootblogrestapi.utils.AppConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +19,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
+@Tag(
+        name="CRUD REST APIs for Post Resource"
+)
 public class PostController {
     private PostService postService;
 
@@ -23,6 +29,14 @@ public class PostController {
         this.postService = postService;
     }
 
+    @Operation(
+            summary = "Create Post REST API",
+            description = "Create Post REST API is used to save post into database"
+    )
+    @ApiResponse(
+            responseCode="201",
+            description = "Http Status 201 "
+    )
     @SecurityRequirement(
           name="Bear Authentication"
     )
@@ -33,6 +47,15 @@ public class PostController {
         return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
     }
 
+
+    @Operation(
+            summary = "Get All Posts REST API",
+            description = "Get All Posts REST API is used to fetch all the posts from the database"
+    )
+    @ApiResponse(
+            responseCode="200",
+            description = "Http Status 200 SUCCESS "
+    )
     //get all posts rest api
     @GetMapping
     public PostResponse getAllPosts(
@@ -44,12 +67,32 @@ public class PostController {
         return postService.getAllPosts(pageNo, pageSize, sortBy, sortDir);
     }
 
+    @Operation(
+            summary = "Get Post By Id REST API",
+            description = "Get Post By Id REST API is used to save post into database"
+    )
+    @ApiResponse(
+            responseCode="200",
+            description = "Http Status 200 SUCCESS"
+    )
     //get post by id
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable(name="id")long id){
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
+
+    @Operation(
+            summary = "update Post REST API",
+            description = "Update Post REST API is used to update a particular post in the database"
+    )
+    @ApiResponse(
+            responseCode="200",
+            description = "Http Status 200 SUCCESS"
+    )
+    @SecurityRequirement(
+            name="Bear Authentication"
+    )
     @PreAuthorize("hasRole('ADMIN')")
     //update post by id rest api
     @PutMapping("/{id}")
@@ -58,6 +101,17 @@ public class PostController {
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Delete Post REST API",
+            description = "Delete Post REST API is used to delete a particular post from the database"
+    )
+    @ApiResponse(
+            responseCode="200",
+            description = "Http Status 200 SUCCESS"
+    )
+    @SecurityRequirement(
+            name="Bear Authentication"
+    )
     @PreAuthorize("hasRole('ADMIN')")
     //delete post rest api
     @DeleteMapping("/{id}")
